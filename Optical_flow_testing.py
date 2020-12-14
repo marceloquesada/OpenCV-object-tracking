@@ -2,40 +2,49 @@ import cv2
 import numpy as np
 
 
-#essa função é chamada quando o opencv detecta um evento no mouse, e passa as coordenadas do clique para a váriavel ponto
+#definição dos hiperparametros
+N_PIXEL = 40 # Quantidade de pixeis calculados ao redor do pixel central
+MAX_LEVEL = 2 # Nível de pirâmide usado
+EPSILON = 0.03 # Valores menores de epsilon deixam o programa mais rápido, porém menos preciso
+OF_ITERATIONS = 10 # Número de iterações do optical flow, quanto mais iteracoes, mais preciso é a detecção, porém roda mais devagar
+
+
+
+# Definição de todas as váriaveis nulas
+point = ()
+point_is_selected = False
+old_points = np.array([[]])
+reference_frame = np.zeros((480,640,3), np.uint8)
+status = 0
+
+
+# Inicializa os parâmetros para o optical flow
+lk_params = dict( winSize =(N_PIXEL, N_PIXEL),
+                  maxLevel=MAX_LEVEL,
+                  criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, OF_ITERATIONS, EPSILON))
+
+
+# Essa função é chamada quando o opencv detecta um evento no mouse, e passa as coordenadas do clique para a váriavel ponto
 def select_point(event, x, y, flags, params):
     global point, point_is_selected, old_points
+
+    # Checa se o evento é um clique do botão esquerdo do mouse e, se sim, pega as coordenadas do clique e as passa para as variaveis
     if event == cv2.EVENT_LBUTTONDOWN:
         point = (x, y)
         point_is_selected = True
         old_points = np.array([[x, y]], dtype=np.float32)
 
 
-#Essa parte determina em que janela que os cliques serão detectados e inicializa a detecção
-cv2.namedWindow("Principal")
-cv2.setMouseCallback("Principal", select_point)
-
-
-#Inicia a gravação de vídeo
+# Inicia a gravação de vídeo
 cap = cv2.VideoCapture(0)
 
-
-#Inicializa os parâmetros para o optical flow
-lk_params = dict( winSize =(40, 40),
-                  maxLevel=2,
-                  criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
-
-#Lê um frame para servir como o primeiro frame para ser comparado no optical flow
+# Lê um frame para servir como o primeiro frame para ser comparado no optical flow
 ret, frame = cap.read()
 old_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-
-#Inicializa todas as váriaveis a serem usadas depois
-point = ()
-point_is_selected = False
-old_points = np.array([[]])
-reference_frame = np.zeros((480,640,3), np.uint8)
-status = 0
+# Cria janela principal e seta a função select_point para ser chamadaema qualquer evento do mouse
+cv2.namedWindow("Principal")
+cv2.setMouseCallback("Principal", select_point)
 
 
 while True:
