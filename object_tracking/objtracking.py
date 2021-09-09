@@ -43,7 +43,7 @@ class object_tracking:
     # The __init__ function recieves the oject of the detection method, the servo ports(optional, if not defined, the program will only run object detection)
     # and the start position(optional, if not defined, just use the default one, pointing forward)
 
-    def __init__(self, detection_method, servoH_port=None, servoV_port=None, start_position=start_position, servo_pos=("positive", "positive")):
+    def __init__(self, detection_method, servoH_port=None, servoV_port=None, start_position=start_position, servo_pos=("add", "add")):
 
         self.detection_method = detection_method
 
@@ -122,11 +122,11 @@ class object_tracking:
                 e_x = self.dynamic_divider(self.divider_slow, self.divider_fast, x_to_center, width/2)
                 e_y = self.dynamic_divider(self.divider_slow, self.divider_fast, y_to_center, height/2)
 
-                if self.servo_pos[0] == "positive":
+                if self.servo_pos[0] == "add":
                     servo_h_angle = self.servo_horizontal.get_angle() + round(x_to_center/e_x, self.rounding)
                 else:
                     servo_h_angle = self.servo_horizontal.get_angle() - round(x_to_center/e_x, self.rounding)
-                if self.servo_pos[1] == "positive":
+                if self.servo_pos[1] == "add":
                     servo_v_angle = self.servo_vertical.get_angle() + round(y_to_center/e_y, self.rounding)
                 else:
                     servo_v_angle = self.servo_vertical.get_angle() - round(y_to_center/e_y, self.rounding)
@@ -208,3 +208,4 @@ class object_tracking:
             self.overlayed_frame = self.draw_text(frame, text)
 
             return self.points[-1], self.overlayed_frame
+
